@@ -5,7 +5,7 @@ import random
 
 # Parameters
 default_n = 1000  # Number of nodes
-default_beta = 0.2  # Infection probability
+default_beta = 0.05  # Infection probability
 default_gamma = 0.2  # Recovery probability
 default_p0 = 0.1  # Initial infection fraction
 default_timesteps = 200  # Number of simulation steps
@@ -67,6 +67,16 @@ def create_graphs(n):
     }
     return graphs
 
+
+# Compute Leading Eigenvalue
+def leading_eigenvalue(G):
+    """Calculate the leading eigenvalue of the adjacency matrix of a graph."""
+    adjacency_matrix = nx.adjacency_matrix(G).todense()
+    eigenvalues = np.linalg.eigvals(adjacency_matrix)
+    return max(np.abs(eigenvalues))
+
+
+
 # Task 1: Simulation and Plotting
 def task1(beta, gamma, p0, timesteps):
     graphs = create_graphs(default_n)
@@ -87,17 +97,32 @@ def task1(beta, gamma, p0, timesteps):
 
 
     for name, G in graphs.items():
-        print(f"Simulating SIS model on {name}...")
+        print(f"\n Simulating SIS model on {name}...")
         infected_over_time = sis_simulation(G, beta, gamma, p0, timesteps)
         results[name] = infected_over_time
 
         # Plot
         plt.plot(range(timesteps + 1), infected_over_time, label=name)
 
+        # Compute and display leading eigenvalue
+        eigenvalue = leading_eigenvalue(G)
+        print(f"Leading eigenvalue of {name}: {eigenvalue:.4f}")
+        print(f"Epidemic threshold for {name}: {gamma / beta:.4f}")
+        #now print beta*lambda
+        print(f"beta*lambda for {name}: {beta*eigenvalue:.4f}")
+        print("Is",beta,"*",eigenvalue,">",gamma,"?")
+        if(beta*eigenvalue>gamma):
+            print(f"YES, Graph {name} is epidemic")
+        else:
+            print(f"NO, Graph {name} is not epidemic")
+        
+        print("Critical value for beta is",1/eigenvalue)
+
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Infected Nodes")
     plt.title("SIS Model Simulation")
-    plt.legend()
+    #legend on the bottom right
+    plt.legend(loc="lower right")
     plt.grid()
     plt.show()
 
