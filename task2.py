@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+#import lab7.py
+from lab7 import create_graphs, sis_simulation, default_n, default_gamma, default_p0, default_timesteps, leading_eigenvalue
+
 # Task 2: Epidemic Threshold Analysis
 def task2(graphs, gamma, timesteps):
     """
